@@ -17,10 +17,9 @@ const Drawing = () => {
   const { num, setNum } = useContext(PredictionContext);
 
   const makePrediction = (data: number[][][]) => {
-    // tf.loadLayersModel(
-    //   tf.io.fromMemory(require("../../model/model.json"))
-    // )
-    tf.loadLayersModel("https://tfhub.dev/tensorflow/tfgan/eval/mnist/logits/1").then((model) => {
+    tf.loadLayersModel(
+      tf.io.fromMemory(require("../../model/model.json"))
+    ).then((model) => {
       let pred = model.apply(tf.tensor([data])).toString()
       pred = pred.slice(14).slice(0, pred.length - 17);
       console.log(pred);
