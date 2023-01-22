@@ -1,7 +1,6 @@
 import React, { useState, useRef, useContext } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import Konva from "konva";
-import * as tf from "@tensorflow/tfjs";
 import PredictionContext from "../Context/PredictionContext";
 
 const Drawing = () => {
@@ -16,70 +15,32 @@ const Drawing = () => {
   const stageRef = useRef<Konva.Stage>(null);
   const { num, setNum } = useContext(PredictionContext);
 
-  const makePrediction = (data: number[][][]) => {
-    tf.loadLayersModel(
-      tf.io.fromMemory(require("../../model/model.json"))
-    ).then((model) => {
-      let pred = model.apply(tf.tensor([data])).toString()
-      pred = pred.slice(14).slice(0, pred.length - 17);
-      console.log(pred);
-      const arr = JSON.parse(`[${pred}]`);
-      const ans = arr.indexOf(Math.max.apply(Math, arr))
-      setNum(prev => ans);
-      console.log("Prediction:", ans);
-    });
-  };
+  async function query(url: any) {
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/farleyknight/mnist-digit-classification-2022-09-04",
+      {
+        headers: { Authorization: "Bearer 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" },
+        method: "POST",
+        body: url,
+      }
+    );
+    const result = await response.json();
+    return result;
+  }
 
-  const handleData = (data: Uint8ClampedArray) => {
-    let matrix: number[][] = [];
-    for (let i = 0; i < size; i++) {
-      let line: number[] = [];
-      for (let j = 0; j < size; j++) {
-        line.push(data[i * size + j]);
-      }
-      matrix.push([...line]);
-    }
-    let compressedMatrix: number[][] = [];
-    const k = Math.floor(size / 28);
-    for (let i = 0; i < 28; i++) {
-      let line: number[] = [];
-      for (let j = 0; j < 28; j++) {
-        let average = 0;
-        for (let m = k * i; m < k * (i + 1); m++) {
-          for (let n = k * j; n < k * (j + 1); n++) {
-            average += matrix[m][n];
-          }
-        }
-        average = Math.floor(average / Math.pow(k, 2)) / 255;
-        line.push(average);
-      }
-      compressedMatrix.push([...line]);
-    }
-    let modelDataInput: number[][][] = [];
-    compressedMatrix.forEach((line) => {
-      let newLine: number[][] = [];
-      line.forEach(num => {
-        newLine.push([num]);
-      });
-      modelDataInput.push(newLine);
-    });
-    console.log(modelDataInput);
-    makePrediction(modelDataInput);
-  };
 
   const handleExport = () => {
     if (stageRef.current) {
-      const ctx = stageRef.current.toCanvas().getContext("2d");
-      const data = ctx?.getImageData(0, 0, 200, 200).data;
-      setNum(prev => "...")
-      if (data) handleData(data.slice(0, data.length / 4));
-      // return stageRef.current.toDataURL();
+      stageRef.current.toBlob().then((res => {
+        setTimeout(() => {
+          query(res).then((response) => {
+            const pred = response[0].label;
+            console.log(pred);
+            setNum((prev) => pred);
+          });
+        }, 1)
+      }))
     }
-
-    // setUrl((prev) => {
-      
-    //   return prev;
-    // });
   };
 
   const handleMouseDown = (e: any) => {
