@@ -6,26 +6,10 @@ const MainComponent = () => {
   const { num, setNum } = useContext(PredictionContext);
 
   return (
-    <div>
-      <div style={{width: "400px", textAlign: "center"}}>WIP</div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          border: "1px solid black",
-          width: "400px",
-        }}
-      >
+    <div className="flex flex-col w-full">
+      <div className="flex flex-row justify-center m-7">
         <Drawing />
-        <div
-          style={{
-            fontSize: "170px",
-            textAlign: "center",
-          }}
-        >
-          {num}
-        </div>
+        <div className="border-2 w-60 h-60 text-xl text-center">{num}</div>
       </div>
     </div>
   );

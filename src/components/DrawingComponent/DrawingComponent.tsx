@@ -8,37 +8,46 @@ const Drawing = () => {
     points: number[] = [];
   }
 
-  const size = 200;
+  const size = 240;
 
   const [lines, setLines] = useState<Point[]>([]);
   const isDrawing = useRef(false);
   const stageRef = useRef<Konva.Stage>(null);
   const { num, setNum } = useContext(PredictionContext);
+  
 
-  async function query(url: any) {
-    const response = await fetch(
+  async function getPrediction(data: any) {
+
+    fetch(
       "https://api-inference.huggingface.co/models/farleyknight/mnist-digit-classification-2022-09-04",
       {
         headers: { Authorization: "Bearer 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" },
         method: "POST",
-        body: url,
+        body: data,
       }
-    );
-    const result = await response.json();
-    return result;
+    ).then(res => {
+
+      if (res.status === 503) {
+        setTimeout(() => {
+          getPrediction(data);
+        }, 20);
+      } else {
+        const prediction = res.json().then(body => {
+          console.log(body);
+          const prediction = body[0].label;
+          setNum(prev => prediction);
+        })
+      }
+
+
+    });
   }
 
 
   const handleExport = () => {
     if (stageRef.current) {
       stageRef.current.toBlob().then((res => {
-        setTimeout(() => {
-          query(res).then((response) => {
-            const pred = response[0].label;
-            console.log(pred);
-            setNum((prev) => pred);
-          });
-        }, 1)
+        getPrediction(res);
       }))
     }
   };
@@ -72,7 +81,7 @@ const Drawing = () => {
   };
 
   return (
-    <div style={{ width: size, height: size }}>
+    <div className="w-60 h-60">
       <Stage
         width={size}
         height={size}
