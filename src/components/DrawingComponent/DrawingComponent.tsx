@@ -14,7 +14,7 @@ const Drawing = () => {
   }
 
   const size = 240;
-  const sqSize = 8; // Squeezed Size
+  const sqSize = 24; // Squeezed Size
   const labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
   const [lines, setLines] = useState<Point[]>([]);
@@ -23,8 +23,7 @@ const Drawing = () => {
   const { num, setNum } = useContext(PredictionContext);
 
   async function getPrediction(data: any) {
-
-    const res = new Promise<string>(resolve => {
+    const res = new Promise<string>((resolve) => {
       fetch(
         "https://api-inference.huggingface.co/models/farleyknight/mnist-digit-classification-2022-09-04",
         {
@@ -48,7 +47,7 @@ const Drawing = () => {
           });
         }
       });
-    })
+    });
 
     return await res;
   }
@@ -104,9 +103,11 @@ const Drawing = () => {
     return Math.sqrt(sum);
   }
 
-
   function compareWithCashed(input: number[]): string {
-    const threshold = 0.025;
+    let threshold = 1e-2;
+    if (localStorage.length < 10) {
+      threshold = 7.1e-9;
+    }
     let distances: number[] = [];
     labels.forEach((label) => {
       const rawItem = localStorage.getItem(label);
@@ -119,19 +120,19 @@ const Drawing = () => {
     });
 
     let sum = 0;
-    distances.forEach(elem => {
-      sum += elem;
-    })
+    distances.forEach((elem) => {
+      sum += Math.exp(elem);
+    });
 
-    distances = distances.map(elem => elem / sum);
+    distances = distances.map((elem) => Math.exp(elem) / sum);
 
     const fastPrediction = distances.indexOf(Math.min(...distances));
 
-    console.log('Distances:', distances);
-    console.log('LocalStorage:', localStorage)
+    console.log("Distances:", distances);
+    console.log("LocalStorage:", localStorage);
 
     if (distances[fastPrediction] <= threshold) {
-      console.log(distances[fastPrediction], '<=', threshold);
+      console.log(distances[fastPrediction], "<=", threshold);
       return labels[fastPrediction];
     }
 
@@ -148,21 +149,27 @@ const Drawing = () => {
           const sqData = squeeze(data);
           const fastPrediction = compareWithCashed(sqData);
           if (fastPrediction) {
-            setNum(prev => fastPrediction);
-            localStorage.setItem("pending", JSON.stringify({
-              squeezed: sqData,
-              label: fastPrediction
-            }));
+            setNum((prev) => fastPrediction);
+            localStorage.setItem(
+              "pending",
+              JSON.stringify({
+                squeezed: sqData,
+                label: fastPrediction,
+              })
+            );
             // addItemToLocalStorage(sqData, fastPrediction);
           } else {
-            getPrediction(res).then(prediction => {
-              setNum(prev => prediction);
-              localStorage.setItem("pending", JSON.stringify({
-                squeezed: sqData,
-                label: prediction
-              }));
+            getPrediction(res).then((prediction) => {
+              setNum((prev) => prediction);
+              localStorage.setItem(
+                "pending",
+                JSON.stringify({
+                  squeezed: sqData,
+                  label: prediction,
+                })
+              );
               // addItemToLocalStorage(sqData, prediction);
-            })
+            });
           }
         }
       });

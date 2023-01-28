@@ -27,7 +27,7 @@ const MainComponent = () => {
   function getAverage(input: number[], base: number[], num: number): number[] {
     const nextAverage: number[] = [];
     base.forEach((elem, i) => {
-      nextAverage.push((elem + input[i]) / (num + 1));
+      nextAverage.push((elem * num + input[i]) / (num + 1));
     });
     return nextAverage;
   }
