@@ -104,35 +104,6 @@ const Drawing = () => {
     return Math.sqrt(sum);
   }
 
-  function getAverage(input: number[], base: number[], num: number): number[] {
-    const nextAverage: number[] = [];
-    base.forEach((elem, i) => {
-      nextAverage.push((elem + input[i]) / (num + 1))
-    })
-    return nextAverage;
-  }
-
-  function addItemToLocalStorage(input: number[], label: string) {
-    const rawItem = localStorage.getItem(label);
-    if (rawItem) {
-      const item: LocalStorageItem = JSON.parse(rawItem);
-      localStorage.setItem(
-        label,
-        JSON.stringify({
-          average: getAverage(input, item.average, item.num),
-          num: item.num + 1
-        })
-      );
-    } else {
-      localStorage.setItem(
-        label,
-        JSON.stringify({
-          average: input,
-          num: 1,
-        })
-      );
-    }
-  }
 
   function compareWithCashed(input: number[]): string {
     const threshold = 0.025;
@@ -178,11 +149,19 @@ const Drawing = () => {
           const fastPrediction = compareWithCashed(sqData);
           if (fastPrediction) {
             setNum(prev => fastPrediction);
-            addItemToLocalStorage(sqData, fastPrediction);
+            localStorage.setItem("pending", JSON.stringify({
+              squeezed: sqData,
+              label: fastPrediction
+            }));
+            // addItemToLocalStorage(sqData, fastPrediction);
           } else {
             getPrediction(res).then(prediction => {
               setNum(prev => prediction);
-              addItemToLocalStorage(sqData, prediction);
+              localStorage.setItem("pending", JSON.stringify({
+                squeezed: sqData,
+                label: prediction
+              }));
+              // addItemToLocalStorage(sqData, prediction);
             })
           }
         }
