@@ -61,6 +61,7 @@ const MainComponent = () => {
       addItemToLocalStorage(pending.squeezed, pending.label);
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
+      refreshPage();
     }
   }
 
@@ -69,6 +70,7 @@ const MainComponent = () => {
     if (rawPending) {
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
+      refreshPage();
     }
   }
 
