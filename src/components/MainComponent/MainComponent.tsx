@@ -1,5 +1,6 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import Drawing from "../DrawingComponent/DrawingComponent";
+import Accuracy from "../AccuracyComponent/Accuracy";
 import PredictionContext from "../Context/PredictionContext";
 
 const MainComponent = () => {
@@ -8,6 +9,14 @@ const MainComponent = () => {
   interface LocalStorageItem {
     average: number[];
     num: number;
+    mustMakeRequest: boolean;
+  }
+
+  const minAccuracyForCashe = 0.6;
+
+  interface AccuracyData {
+    success: number;
+    failure: number;
   }
 
   interface PendingPrediction {
@@ -15,8 +24,62 @@ const MainComponent = () => {
     label: string;
   }
 
+  const [accuracy, setAccuracy] = useState(0);
+
+  useEffect(() => {
+    initializeAccuracy();
+  }, [accuracy]);
+
+  function initializeAccuracy() {
+    if (!localStorage.getItem("accuracy")) {
+      localStorage.setItem(
+        "accuracy",
+        JSON.stringify({
+          success: 0,
+          failure: 0,
+        })
+      );
+      setAccuracy((prev) => 0);
+    } else {
+      const storedAccuracy: AccuracyData = JSON.parse(
+        localStorage.getItem("accuracy") || ""
+      );
+
+      setAccuracy(
+        (prev) =>
+          (storedAccuracy.success /
+            (storedAccuracy.success + storedAccuracy.failure)) *
+          100
+      );
+    }
+  }
+
+  function updateAccuracy(success: boolean) {
+    initializeAccuracy();
+
+    const storedAccuracy: AccuracyData = JSON.parse(
+      localStorage.getItem("accuracy") || ""
+    );
+
+    if (success) {
+      storedAccuracy.success++;
+    } else {
+      storedAccuracy.failure++;
+    }
+
+    localStorage.setItem("accuracy", JSON.stringify(storedAccuracy));
+
+    setAccuracy(
+      (prev) =>
+        (storedAccuracy.success /
+          (storedAccuracy.success + storedAccuracy.failure)) *
+        100
+    );
+  }
+
   function clearLocalStorage() {
     localStorage.clear();
+    setAccuracy(prev => 0);
     console.log("LocalStorage:", localStorage);
   }
 
@@ -25,6 +88,7 @@ const MainComponent = () => {
   }
 
   function getAverage(input: number[], base: number[], num: number): number[] {
+    if (input.length === 0) return base;
     const nextAverage: number[] = [];
     base.forEach((elem, i) => {
       nextAverage.push((elem * num + input[i]) / (num + 1));
@@ -32,7 +96,7 @@ const MainComponent = () => {
     return nextAverage;
   }
 
-  function addItemToLocalStorage(input: number[], label: string) {
+  function addItemToLocalStorage(input: number[], label: string, mustMakeRequest: boolean) {
     const rawItem = localStorage.getItem(label);
     if (rawItem) {
       const item: LocalStorageItem = JSON.parse(rawItem);
@@ -41,6 +105,7 @@ const MainComponent = () => {
         JSON.stringify({
           average: getAverage(input, item.average, item.num),
           num: item.num + 1,
+          mustMakeRequest: mustMakeRequest,
         })
       );
     } else {
@@ -49,6 +114,7 @@ const MainComponent = () => {
         JSON.stringify({
           average: input,
           num: 1,
+          mustMakeRequest: mustMakeRequest,
         })
       );
     }
@@ -58,26 +124,30 @@ const MainComponent = () => {
     const rawPending = localStorage.getItem("pending");
     if (rawPending) {
       const pending: PendingPrediction = JSON.parse(rawPending);
-      addItemToLocalStorage(pending.squeezed, pending.label);
+      addItemToLocalStorage(pending.squeezed, pending.label, false);
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
-      refreshPage();
+      updateAccuracy(true);
+      setNum((prev) => "");
     }
   }
 
   function handleWrong() {
     const rawPending = localStorage.getItem("pending");
     if (rawPending) {
+      const pending: PendingPrediction = JSON.parse(rawPending);
+      addItemToLocalStorage([], pending.label, false);
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
-      refreshPage();
+      updateAccuracy(false);
+      setNum((prev) => "");
     }
   }
 
   return (
     <div className="flex flex-col w-full items-center">
       <div className="flex flex-row justify-center m-7">
-        <Drawing />
+        <Drawing coefficient={minAccuracyForCashe} />
         <div className="border-2 w-60 h-60 text-xl text-center">{num}</div>
       </div>
 
@@ -106,6 +176,10 @@ const MainComponent = () => {
         >
           Clear Cashe
         </button>
+      </div>
+
+      <div className="w-64 py-4 h-16">
+        <Accuracy accuracy={accuracy} coefficient={minAccuracyForCashe} />
       </div>
     </div>
   );

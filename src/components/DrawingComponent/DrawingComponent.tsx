@@ -1,16 +1,27 @@
-import React, { useState, useRef, useContext } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import Konva from "konva";
 import PredictionContext from "../Context/PredictionContext";
+import userEvent from "@testing-library/user-event";
 
-const Drawing = () => {
+interface DrawingProps {
+  coefficient: number;
+}
+
+const Drawing = (props: DrawingProps) => {
   class Point {
     points: number[] = [];
+  }
+
+  interface AccuracyData {
+    success: number;
+    failure: number;
   }
 
   interface LocalStorageItem {
     average: number[];
     num: number;
+    mustMakeRequest: boolean;
   }
 
   const size = 240;
@@ -21,6 +32,14 @@ const Drawing = () => {
   const isDrawing = useRef(false);
   const stageRef = useRef<Konva.Stage>(null);
   const { num, setNum } = useContext(PredictionContext);
+
+  useEffect(() => {
+    // console.log('Num changed to:', num);
+    if (stageRef.current && num === "") {
+      const layers = stageRef.current.getChildren();
+      layers.forEach((layer) => layer.destroyChildren());
+    }
+  }, [num]);
 
   async function getPrediction(data: any) {
     const res = new Promise<string>((resolve) => {
@@ -131,7 +150,26 @@ const Drawing = () => {
     console.log("Distances:", distances);
     console.log("LocalStorage:", localStorage);
 
-    if (distances[fastPrediction] <= threshold) {
+    const storedAccuracy: AccuracyData = JSON.parse(
+      localStorage.getItem("accuracy") || ""
+    );
+    const successCoefficient =
+      storedAccuracy.success /
+      (storedAccuracy.success + storedAccuracy.failure);
+
+    console.table(storedAccuracy);
+
+    if (localStorage.getItem(labels[fastPrediction])) {
+      const item: LocalStorageItem = JSON.parse(
+        localStorage.getItem(labels[fastPrediction]) || ""
+      );
+      if (item.mustMakeRequest) return "";
+    }
+
+    if (
+      distances[fastPrediction] <= threshold &&
+      successCoefficient > props.coefficient
+    ) {
       console.log(distances[fastPrediction], "<=", threshold);
       return labels[fastPrediction];
     }

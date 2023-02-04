@@ -5,6 +5,8 @@ export class PredictionContextType {
   setNum: React.Dispatch<React.SetStateAction<string>> = () => {};
 }
 
-const PredictionContext = createContext<PredictionContextType>(new PredictionContextType());
+const PredictionContext = createContext<PredictionContextType>(
+  new PredictionContextType()
+);
 
 export default PredictionContext;
