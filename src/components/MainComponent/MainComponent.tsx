@@ -136,7 +136,7 @@ const MainComponent = () => {
     const rawPending = localStorage.getItem("pending");
     if (rawPending) {
       const pending: PendingPrediction = JSON.parse(rawPending);
-      addItemToLocalStorage([], pending.label, false);
+      addItemToLocalStorage([], pending.label, true);
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
       updateAccuracy(false);
