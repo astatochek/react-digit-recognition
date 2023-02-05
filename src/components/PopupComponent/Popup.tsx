@@ -4,7 +4,7 @@ import PopupContext from "../Context/PopupContext";
 const PopupComponent = () => {
   const { active, setActive } = useContext(PopupContext);
 
-  const initialDelay = 20;
+  const initialDelay = 25;
 
   const [delay, setDelay] = useState(initialDelay);
 

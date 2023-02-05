@@ -42,36 +42,31 @@ const Drawing = (props: DrawingProps) => {
     }
   }, [num]);
 
-  async function getPrediction(data: any) {
-    const res = new Promise<string>((resolve) => {
-      fetch(
-        "https://api-inference.huggingface.co/models/farleyknight/mnist-digit-classification-2022-09-04",
-        {
-          headers: {
-            Authorization: "Bearer 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",
-          },
-          method: "POST",
-          body: data,
-        }
-      ).then((res) => {
-        if (!res.ok) {
-          setTimeout(() => {
-            setActive(prev => true);
-            getPrediction(data);
-          }, 1000);
-        } else {
-          const _ = res.json().then((body) => {
-            console.table(body);
-            const prediction = body[0].label;
-            setActive(prev => false);
-            setNum((prev) => prediction);
-            resolve(prediction);
-          });
-        }
-      });
+  async function getPrediction(data: any, sqData: number[]) {
+    fetch(
+      "https://api-inference.huggingface.co/models/farleyknight/mnist-digit-classification-2022-09-04",
+      {
+        headers: {
+          Authorization: "Bearer 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",
+        },
+        method: "POST",
+        body: data,
+      }
+    ).then((res) => {
+      if (!res.ok) {
+        setTimeout(() => {
+          setActive((prev) => true);
+          getPrediction(data, sqData);
+        }, 1000);
+      } else {
+        const _ = res.json().then((body) => {
+          console.table(body);
+          const prediction = body[0].label;
+          setActive((prev) => false);
+          handleResolvedPrediction(prediction, sqData);
+        });
+      }
     });
-
-    return await res;
   }
 
   function squeeze(data: Uint8ClampedArray): number[] {
@@ -200,22 +195,23 @@ const Drawing = (props: DrawingProps) => {
             );
             // addItemToLocalStorage(sqData, fastPrediction);
           } else {
-            getPrediction(res).then((prediction) => {
-              setNum((prev) => prediction);
-              localStorage.setItem(
-                "pending",
-                JSON.stringify({
-                  squeezed: sqData,
-                  label: prediction,
-                })
-              );
-              // addItemToLocalStorage(sqData, prediction);
-            });
+            getPrediction(res, sqData);
           }
         }
       });
     }
   };
+
+  function handleResolvedPrediction(prediction: string, sqData: number[]) {
+    setNum((prev) => prediction);
+    localStorage.setItem(
+      "pending",
+      JSON.stringify({
+        squeezed: sqData,
+        label: prediction,
+      })
+    );
+  }
 
   const handleMouseDown = (e: any) => {
     isDrawing.current = true;
@@ -245,7 +241,6 @@ const Drawing = (props: DrawingProps) => {
   };
 
   const { active, setActive } = useContext(PopupContext);
-  
 
   return (
     <>
