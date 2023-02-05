@@ -21,14 +21,14 @@ const PopupComponent = () => {
     <>
       {active && (
         <div className="h-screen w-screen bg-[rgba(0,0,0,0.7)] fixed left-0 top-0 flex justify-center items-center">
-          <div className="w-3/5 p-4 text-center bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-            <h5 className="mb-2 text-4xl font-bold text-gray-900 dark:text-white">
+          <div className="w-3/5 p-4 text-center border rounded-lg shadow sm:p-8 bg-gray-800 border-gray-700">
+            <h5 className="mb-2 text-4xl font-bold text-white">
               Connecting to{" "}
               <a href="https://huggingface.co/" className="hover:text-blue-500">
                 huggingface.co
               </a>
             </h5>
-            <p className="my-3 text-3xl text-gray-500 sm:text-lg dark:text-gray-400">
+            <p className="my-3 text-3xl sm:text-lg text-gray-400">
               Please wait {delay}s :)
             </p>
           </div>

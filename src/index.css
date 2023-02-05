@@ -3,5 +3,5 @@
 @tailwind utilities;
 
 body {
-    @apply dark:bg-github-dark-gray dark:text-white font-["Segoe_UI"];
+    @apply bg-github-dark-gray text-white font-["Segoe_UI"];
 }

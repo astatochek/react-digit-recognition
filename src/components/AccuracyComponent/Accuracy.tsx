@@ -17,7 +17,7 @@ const Accuracy = ({ accuracy, coefficient }: AccuracyProps) => {
           bgFlag ? "bg-red-700" : "bg-green-700"
         }`}
       ></div>
-      <p className="my-2 text-base dark:text-white">Accuracy: {accuracy.toFixed(2)}%</p>
+      <p className="my-2 text-base text-white">Accuracy: {accuracy.toFixed(2)}%</p>
       
     </div>
   );
