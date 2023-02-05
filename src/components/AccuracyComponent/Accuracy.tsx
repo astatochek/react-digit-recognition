@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 
-interface AccurcyProps {
+interface AccuracyProps {
   accuracy: number;
   coefficient: number;
 }
 
-const Accuracy = (props: AccurcyProps) => {
+const Accuracy = (props: AccuracyProps) => {
 
   const bgFlag = props.accuracy < props.coefficient * 100;
 

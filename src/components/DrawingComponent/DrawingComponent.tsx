@@ -59,7 +59,7 @@ const Drawing = (props: DrawingProps) => {
           }, 1000);
         } else {
           const prediction = res.json().then((body) => {
-            console.log(body);
+            console.table(body);
             const prediction = body[0].label;
             // setNum((prev) => prediction);
             resolve(prediction);
