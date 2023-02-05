@@ -4,8 +4,15 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    fontSize: {
-      xl: ['220px', '220px'],
+    extend: {
+      fontSize: {
+        'mega-xl': ['220px', '220px'],
+      },
+      colors: {
+        'github-dark-deep': '#010409',
+        'github-dark-gray': '#0d1117',
+        'github-gray': '#21262d',
+      }
     }
   },
   plugins: [],

@@ -5,19 +5,20 @@ interface AccuracyProps {
   coefficient: number;
 }
 
-const Accuracy = (props: AccuracyProps) => {
+const Accuracy = ({ accuracy, coefficient }: AccuracyProps) => {
 
-  const bgFlag = props.accuracy < props.coefficient * 100;
+  const bgFlag = accuracy < coefficient * 100;
 
   return (
-    <div className="h-2 w-full bg-gray-300 text-center text-gray-800 font-semibold rounded shadow">
+    <div className="h-2 w-72 bg-gray-300 text-center text-gray-800 font-semibold rounded shadow">
       <div
-        style={{ width: `${props.accuracy}%` }}
+        style={{ width: `${accuracy}%` }}
         className={`h-full rounded ${
-          bgFlag ? "bg-red-600" : "bg-green-600"
+          bgFlag ? "bg-red-700" : "bg-green-700"
         }`}
       ></div>
-      Accuracy: {props.accuracy.toFixed(2)}%
+      <p className="my-2 text-base dark:text-white">Accuracy: {accuracy.toFixed(2)}%</p>
+      
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useRef, useContext, useEffect } from "react";
 import { Stage, Layer, Line } from "react-konva";
 import Konva from "konva";
 import PredictionContext from "../Context/PredictionContext";
+import PopupContext from "../Context/PopupContext";
 import userEvent from "@testing-library/user-event";
 
 interface DrawingProps {
@@ -53,15 +54,17 @@ const Drawing = (props: DrawingProps) => {
           body: data,
         }
       ).then((res) => {
-        if (res.status !== 200) {
+        if (!res.ok) {
           setTimeout(() => {
+            setActive(prev => true);
             getPrediction(data);
           }, 1000);
         } else {
-          const prediction = res.json().then((body) => {
+          const _ = res.json().then((body) => {
             console.table(body);
             const prediction = body[0].label;
-            // setNum((prev) => prediction);
+            setActive(prev => false);
+            setNum((prev) => prediction);
             resolve(prediction);
           });
         }
@@ -241,15 +244,17 @@ const Drawing = (props: DrawingProps) => {
     handleExport();
   };
 
+  const { active, setActive } = useContext(PopupContext);
+  
+
   return (
-    <div className="w-60 h-60">
+    <>
       <Stage
         width={size}
         height={size}
         onMouseDown={handleMouseDown}
         onMousemove={handleMouseMove}
         onMouseup={handleMouseUp}
-        style={{ background: "black" }}
         ref={stageRef}
       >
         <Layer>
@@ -267,7 +272,7 @@ const Drawing = (props: DrawingProps) => {
           ))}
         </Layer>
       </Stage>
-    </div>
+    </>
   );
 };
 

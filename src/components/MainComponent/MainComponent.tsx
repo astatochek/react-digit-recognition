@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from "react";
 import Drawing from "../DrawingComponent/DrawingComponent";
 import Accuracy from "../AccuracyComponent/Accuracy";
 import PredictionContext from "../Context/PredictionContext";
+import PopupComponent from "../PopupComponent/Popup";
 
 const MainComponent = () => {
   const { num, setNum } = useContext(PredictionContext);
@@ -45,11 +46,12 @@ const MainComponent = () => {
         localStorage.getItem("accuracy") || ""
       );
 
-      setAccuracy(
-        (prev) =>
-          (storedAccuracy.success /
-            (storedAccuracy.success + storedAccuracy.failure)) *
-          100
+      setAccuracy((prev) =>
+        storedAccuracy.success + storedAccuracy.failure === 0
+          ? 0
+          : (storedAccuracy.success /
+              (storedAccuracy.success + storedAccuracy.failure)) *
+            100
       );
     }
   }
@@ -69,17 +71,18 @@ const MainComponent = () => {
 
     localStorage.setItem("accuracy", JSON.stringify(storedAccuracy));
 
-    setAccuracy(
-      (prev) =>
-        (storedAccuracy.success /
-          (storedAccuracy.success + storedAccuracy.failure)) *
-        100
-    );
+    setAccuracy((prev) =>
+        storedAccuracy.success + storedAccuracy.failure === 0
+          ? 0
+          : (storedAccuracy.success /
+              (storedAccuracy.success + storedAccuracy.failure)) *
+            100
+      );
   }
 
   function clearLocalStorage() {
     localStorage.clear();
-    setAccuracy(prev => 0);
+    setAccuracy((prev) => 0);
     console.log("LocalStorage:", localStorage);
   }
 
@@ -96,7 +99,11 @@ const MainComponent = () => {
     return nextAverage;
   }
 
-  function addItemToLocalStorage(input: number[], label: string, mustMakeRequest: boolean) {
+  function addItemToLocalStorage(
+    input: number[],
+    label: string,
+    mustMakeRequest: boolean
+  ) {
     const rawItem = localStorage.getItem(label);
     if (rawItem) {
       const item: LocalStorageItem = JSON.parse(rawItem);
@@ -145,41 +152,49 @@ const MainComponent = () => {
   }
 
   return (
-    <div className="flex flex-col w-full items-center">
-      <div className="flex flex-row justify-center m-7">
-        <Drawing coefficient={minAccuracyForCashe} />
-        <div className="border-2 w-60 h-60 text-xl text-center">{num}</div>
-      </div>
+    <div className="w-full flex flex-col items-center justify-center">
+      <div className="bg-github-dark-deep border border-gray-200 rounded py-6 px-12 my-12">
+        <div className="flex flex-row justify-center m-7">
+          <div className="w-60 h-60 bg-github-dark-gray border border-gray-200 rounded-l">
+            <Drawing coefficient={minAccuracyForCashe} />
+          </div>
+          <div className="w-60 h-60 text-mega-xl bg-github-dark-gray border border-gray-200 text-center rounded-r">
+            {num}
+          </div>
+        </div>
 
-      <div className="flex flex-row justify-center m-2">
-        <button
-          className="w-32 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow mx-1"
-          onClick={refreshPage}
-        >
-          Refresh
-        </button>
-        <button
-          className="w-32 bg-transparent hover:bg-green-500 text-green-600 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded mx-1"
-          onClick={handleCorrect}
-        >
-          Correct &#10003;
-        </button>
-        <button
-          className="w-32 bg-transparent hover:bg-red-500 text-red-600 font-semibold hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded mx-1"
-          onClick={handleWrong}
-        >
-          Wrong &#215;
-        </button>
-        <button
-          className="w-32 bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow mx-1"
-          onClick={clearLocalStorage}
-        >
-          Clear Cashe
-        </button>
-      </div>
+        <div className="flex flex-row justify-center m-2">
+          <button
+            className="w-32 mx-2 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+            onClick={refreshPage}
+          >
+            Refresh
+          </button>
+          <button
+            className="w-32 mx-2 text-center focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+            onClick={handleCorrect}
+          >
+            Correct
+          </button>
+          <button
+            className="w-32 mx-2 focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+            onClick={handleWrong}
+          >
+            Wrong
+          </button>
+          <button
+            className="w-32 mx-2 text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+            onClick={clearLocalStorage}
+          >
+            Clear Cashe
+          </button>
+        </div>
 
-      <div className="w-64 py-4 h-16">
-        <Accuracy accuracy={accuracy} coefficient={minAccuracyForCashe} />
+        <div className="w-full py-4 h-16 flex items-center justify-center">
+          <Accuracy accuracy={accuracy} coefficient={minAccuracyForCashe} />
+        </div>
+
+        <PopupComponent />
       </div>
     </div>
   );
