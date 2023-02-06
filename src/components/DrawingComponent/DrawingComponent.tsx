@@ -177,6 +177,7 @@ const Drawing = (props: DrawingProps) => {
 
   const handleExport = () => {
     if (stageRef.current) {
+      console.log(stageRef.current.toDataURL());
       stageRef.current.toBlob().then((res) => {
         // getPrediction(res);
         const ctx = stageRef.current?.toCanvas().getContext("2d");

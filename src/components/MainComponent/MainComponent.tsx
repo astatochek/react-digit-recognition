@@ -153,19 +153,19 @@ const MainComponent = () => {
 
   return (
     <div className="w-full flex flex-col items-center justify-center">
-      <div className="bg-github-dark-deep border border-gray-200 rounded py-6 px-12 my-12">
+      <div className="bg-gray-200 border-gray-300 dark:bg-github-dark-deep border dark:border-gray-200 rounded py-6 px-12 my-12 shadow">
         <div className="flex flex-row justify-center m-7">
-          <div className="w-60 h-60 bg-github-dark-gray border border-gray-200 rounded-l">
+          <div className="w-60 h-60 bg-black dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 rounded-l">
             <Drawing coefficient={minAccuracyForCashe} />
           </div>
-          <div className="w-60 h-60 text-mega-xl bg-github-dark-gray border border-gray-200 text-center rounded-r">
+          <div className="w-60 h-60 text-mega-xl text-white bg-black  dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 text-center rounded-r">
             {num}
           </div>
         </div>
 
         <div className="flex flex-row justify-center m-2">
           <button
-            className="w-32 mx-2 border focus:outline-none focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 bg-gray-800 text-white border-gray-600 hover:bg-gray-700 hover:border-gray-600 focus:ring-gray-700"
+            className="w-32 mx-2 border github-base-button"
             onClick={refreshPage}
           >
             Refresh
@@ -183,7 +183,7 @@ const MainComponent = () => {
             Wrong
           </button>
           <button
-            className="w-32 mx-2 border focus:outline-none focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 bg-gray-800 text-white border-gray-600 hover:bg-gray-700 hover:border-gray-600 focus:ring-gray-700"
+            className="w-32 mx-2 github-base-button"
             onClick={clearLocalStorage}
           >
             Clear Cashe
