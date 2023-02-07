@@ -1,0 +1,14 @@
+#loading-icon {
+  width: 2rem;
+  height: 2rem;
+  animation: loading-spinner 1s linear infinite;
+}
+
+@keyframes loading-icon {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
