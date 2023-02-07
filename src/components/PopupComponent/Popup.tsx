@@ -20,9 +20,9 @@ const PopupComponent = () => {
 
   return (
     <>
-      {true && (
+      {active && (
         <div className="h-screen w-screen bg-[rgba(0,0,0,0.7)] fixed left-0 top-0 flex justify-center items-center">
-          <div className="w-3/5 p-4 text-center border rounded-lg shadow sm:p-8 bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <div className="w-3/5 p-4 text-center border rounded-lg shadow sm:p-8 bg-white border-gray-200 dark:bg-github-dark-gray dark:border-gray-700">
             <div className="flex flex-row items-center justify-center">
               <LoadingComonent />
               <h5 className="mb-2 text-4xl font-bold text-gray-800 dark:text-white">

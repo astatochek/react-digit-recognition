@@ -1,6 +1,5 @@
 #loading-icon {
   width: 2rem;
-  height: 2rem;
   animation: loading-spinner 1s linear infinite;
 }
 
