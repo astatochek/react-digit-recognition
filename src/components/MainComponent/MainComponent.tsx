@@ -72,18 +72,19 @@ const MainComponent = () => {
     localStorage.setItem("accuracy", JSON.stringify(storedAccuracy));
 
     setAccuracy((prev) =>
-        storedAccuracy.success + storedAccuracy.failure === 0
-          ? 0
-          : (storedAccuracy.success /
-              (storedAccuracy.success + storedAccuracy.failure)) *
-            100
-      );
+      storedAccuracy.success + storedAccuracy.failure === 0
+        ? 0
+        : (storedAccuracy.success /
+            (storedAccuracy.success + storedAccuracy.failure)) *
+          100
+    );
   }
 
   function clearLocalStorage() {
     localStorage.clear();
     setAccuracy((prev) => 0);
     console.log("LocalStorage:", localStorage);
+    refreshPage();
   }
 
   function refreshPage() {

@@ -28,6 +28,9 @@ const Drawing = (props: DrawingProps) => {
   const size = 240;
   const sqSize = 24; // Squeezed Size
   const labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  const isDarkTheme = window.matchMedia(
+    "(prefers-color-scheme: light)"
+  ).matches;
 
   const [lines, setLines] = useState<Point[]>([]);
   const isDrawing = useRef(false);
@@ -44,7 +47,7 @@ const Drawing = (props: DrawingProps) => {
 
   async function getPrediction(data: any, sqData: number[]) {
     fetch(
-      "https://api-inference.huggingface.co/models/farleyknight/mnist-digit-classification-2022-09-04",
+      "https://api-inference.huggingface.co/models/farleyknight-org-username/vit-base-mnist",
       {
         headers: {
           Authorization: "Bearer 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",
