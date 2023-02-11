@@ -1,0 +1,16 @@
+#loading-icon {
+  width: 2rem;
+}
+
+.animated-block {
+  animation: animated-block 1s linear infinite;
+}
+
+@keyframes animated-block {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}

@@ -28,9 +28,9 @@ const Drawing = (props: DrawingProps) => {
   const size = 240;
   const sqSize = 24; // Squeezed Size
   const labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-  const isDarkTheme = window.matchMedia(
-    "(prefers-color-scheme: light)"
-  ).matches;
+  // const isDarkTheme = window.matchMedia(
+  //   "(prefers-color-scheme: light)"
+  // ).matches;
 
   const [lines, setLines] = useState<Point[]>([]);
   const isDrawing = useRef(false);
@@ -46,7 +46,7 @@ const Drawing = (props: DrawingProps) => {
   }, [num]);
 
   async function getPrediction(data: any, sqData: number[]) {
-    fetch(
+    const res = await fetch(
       "https://api-inference.huggingface.co/models/farleyknight-org-username/vit-base-mnist",
       {
         headers: {
@@ -55,21 +55,20 @@ const Drawing = (props: DrawingProps) => {
         method: "POST",
         body: data,
       }
-    ).then((res) => {
-      if (!res.ok) {
-        setTimeout(() => {
-          setActive((prev) => true);
-          getPrediction(data, sqData);
-        }, 1000);
-      } else {
-        const _ = res.json().then((body) => {
-          console.table(body);
-          const prediction = body[0].label;
-          setActive((prev) => false);
-          handleResolvedPrediction(prediction, sqData);
-        });
-      }
-    });
+    );
+
+    if (!res.ok) {
+      setTimeout(() => {
+        setActive((prev) => true);
+        getPrediction(data, sqData);
+      }, 1000);
+    } else {
+      const body = await res.json();
+      console.table(body);
+      const prediction = body[0].label;
+      setActive((prev) => false);
+      handleResolvedPrediction(prediction, sqData);
+    }
   }
 
   function squeeze(data: Uint8ClampedArray): number[] {
@@ -178,31 +177,29 @@ const Drawing = (props: DrawingProps) => {
     return "";
   }
 
-  const handleExport = () => {
+  const handleExport = async () => {
     if (stageRef.current) {
       console.log(stageRef.current.toDataURL());
-      stageRef.current.toBlob().then((res) => {
-        // getPrediction(res);
-        const ctx = stageRef.current?.toCanvas().getContext("2d");
-        if (ctx) {
-          const data = ctx.getImageData(0, 0, size, size).data;
-          const sqData = squeeze(data);
-          const fastPrediction = compareWithCashed(sqData);
-          if (fastPrediction) {
-            setNum((prev) => fastPrediction);
-            localStorage.setItem(
-              "pending",
-              JSON.stringify({
-                squeezed: sqData,
-                label: fastPrediction,
-              })
-            );
-            // addItemToLocalStorage(sqData, fastPrediction);
-          } else {
-            getPrediction(res, sqData);
-          }
+      const blob = await stageRef.current.toBlob();
+      const ctx = stageRef.current?.toCanvas().getContext("2d");
+      if (ctx) {
+        const data = ctx.getImageData(0, 0, size, size).data;
+        const sqData = squeeze(data);
+        const fastPrediction = compareWithCashed(sqData);
+        if (fastPrediction) {
+          setNum((prev) => fastPrediction);
+          localStorage.setItem(
+            "pending",
+            JSON.stringify({
+              squeezed: sqData,
+              label: fastPrediction,
+            })
+          );
+          // addItemToLocalStorage(sqData, fastPrediction);
+        } else {
+          getPrediction(blob, sqData);
         }
-      });
+      }
     }
   };
 
@@ -218,6 +215,7 @@ const Drawing = (props: DrawingProps) => {
   }
 
   const handleMouseDown = (e: any) => {
+    console.log(document.body.style.overflow);
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
     setLines([...lines, { points: [pos.x, pos.y] }]);

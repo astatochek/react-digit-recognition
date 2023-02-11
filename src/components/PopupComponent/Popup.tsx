@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from "react";
 import PopupContext from "../Context/PopupContext";
-import LoadingComonent from "./Loading";
+import LoadingComonent from "./Loading/Loading";
 
 const PopupComponent = () => {
   const { active, setActive } = useContext(PopupContext);
@@ -25,7 +25,7 @@ const PopupComponent = () => {
           <div className="w-3/5 p-4 text-center border rounded-lg shadow sm:p-8 bg-white border-gray-200 dark:bg-github-dark-gray dark:border-gray-700">
             <div className="flex flex-row items-center justify-center">
               <LoadingComonent />
-              <h5 className="mb-2 text-4xl font-bold text-gray-800 dark:text-white">
+              <h5 className="mb-2 text-4xl font-bold text-gray-800 dark:text-white text-left">
                 connecting to {" "}
                 <a
                   href="https://huggingface.co/"
