@@ -25,7 +25,6 @@ const Drawing = (props: DrawingProps) => {
     mustMakeRequest: boolean;
   }
 
-  const size = 240;
   const sqSize = 24; // Squeezed Size
   const labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
   // const isDarkTheme = window.matchMedia(
@@ -36,6 +35,9 @@ const Drawing = (props: DrawingProps) => {
   const isDrawing = useRef(false);
   const stageRef = useRef<Konva.Stage>(null);
   const { num, setNum } = useContext(PredictionContext);
+
+  const remSize = 60;
+  const size = Math.floor(parseInt(getComputedStyle(document.documentElement).fontSize) * remSize / 4);
 
   useEffect(() => {
     // console.log('Num changed to:', num);

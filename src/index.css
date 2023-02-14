@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 body {
-  @apply dark:bg-github-dark-gray dark:text-white font-["Segoe_UI"];
+  @apply dark:bg-github-dark-gray dark:text-white;
+  font-family: "Segoe UI", sans-serif;
 }
 
 @layer components {
