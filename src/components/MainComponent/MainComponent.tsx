@@ -156,7 +156,7 @@ const MainComponent = () => {
     <div className="w-full flex flex-col items-center justify-center">
       <div className="bg-gray-200 border-gray-300 dark:bg-github-dark-deep border dark:border-gray-200 rounded py-6 px-12 my-12 shadow">
         <div className="flex flex-row justify-center m-7">
-          <div className="w-60 h-60 bg-black dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 rounded-l">
+          <div className="touch-none w-60 h-60 bg-black dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 rounded-l">
             <Drawing coefficient={minAccuracyForCashe} />
           </div>
           <div className="w-60 h-60 text-mega-xl text-white bg-black  dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 text-center rounded-r">

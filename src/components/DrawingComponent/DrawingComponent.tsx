@@ -37,7 +37,19 @@ const Drawing = (props: DrawingProps) => {
   const { num, setNum } = useContext(PredictionContext);
 
   const remSize = 60;
-  const size = Math.floor(parseInt(getComputedStyle(document.documentElement).fontSize) * remSize / 4);
+  const size = Math.floor(
+    (parseInt(getComputedStyle(document.documentElement).fontSize) * remSize) /
+      4
+  );
+
+  const isTouchScreenDevice = () => {
+    try {
+      document.createEvent("TouchEvent");
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
 
   useEffect(() => {
     // console.log('Num changed to:', num);
@@ -216,12 +228,21 @@ const Drawing = (props: DrawingProps) => {
     );
   }
 
+  const handleMouseDownEvent = (e: any) => {
+    if (isTouchScreenDevice()) return;
+    handleMouseDown(e);
+  }
+
   const handleMouseDown = (e: any) => {
-    console.log(document.body.style.overflow);
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
     setLines([...lines, { points: [pos.x, pos.y] }]);
   };
+
+  const handleMouseMoveEvent = (e: any) => {
+    if (isTouchScreenDevice()) return;
+    handleMouseMove(e);
+  }
 
   const handleMouseMove = (e: any) => {
     // no drawing - skipping
@@ -239,6 +260,11 @@ const Drawing = (props: DrawingProps) => {
     setLines(lines.concat());
   };
 
+  const handleMouseUpEvent = () => {
+    if (isTouchScreenDevice()) return;
+    handleMouseUp();
+  }
+
   const handleMouseUp = () => {
     isDrawing.current = false;
     handleExport();
@@ -251,9 +277,12 @@ const Drawing = (props: DrawingProps) => {
       <Stage
         width={size}
         height={size}
-        onMouseDown={handleMouseDown}
-        onMousemove={handleMouseMove}
-        onMouseup={handleMouseUp}
+        onMouseDown={handleMouseDownEvent}
+        onMouseMove={handleMouseMoveEvent}
+        onMouseUp={handleMouseUpEvent}
+        onTouchStart={handleMouseDown}
+        onTouchMove={handleMouseMove}
+        onTouchEnd={handleMouseUp}
         ref={stageRef}
       >
         <Layer>
