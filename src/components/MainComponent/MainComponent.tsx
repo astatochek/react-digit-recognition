@@ -3,6 +3,10 @@ import Drawing from "../DrawingComponent/DrawingComponent";
 import Accuracy from "../AccuracyComponent/Accuracy";
 import PredictionContext from "../Context/PredictionContext";
 import PopupComponent from "../PopupComponent/Popup";
+import RefreshButton from "./Buttons/Refresh";
+import CorrectButton from "./Buttons/Correct";
+import WrongButton from "./Buttons/Wrong";
+import ClearCasheButton from "./Buttons/ClearCashe";
 
 const MainComponent = () => {
   const { num, setNum } = useContext(PredictionContext);
@@ -153,9 +157,9 @@ const MainComponent = () => {
   }
 
   return (
-    <div className="w-full flex flex-col items-center justify-center">
-      <div className="bg-gray-200 border-gray-300 dark:bg-github-dark-deep border dark:border-gray-200 rounded py-6 px-12 my-12 shadow">
-        <div className="flex flex-row justify-center m-7">
+    <div className="w-full flex items-center justify-center">
+      <div className="bg-gray-200 border-gray-300 dark:bg-github-dark-deep border dark:border-gray-200 rounded py-2 sm:py-6 px-4 sm:px-12 m-4 sm:my-12 shadow">
+        <div className="flex flex-col sm:flex-row justify-center items-center m-3 sm:m-7">
           <div className="touch-none w-60 h-60 bg-black dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 rounded-l">
             <Drawing coefficient={minAccuracyForCashe} />
           </div>
@@ -164,32 +168,21 @@ const MainComponent = () => {
           </div>
         </div>
 
-        <div className="flex flex-row justify-center m-2">
-          <button
-            className="w-32 mx-2 border github-base-button"
-            onClick={refreshPage}
-          >
-            Refresh
-          </button>
-          <button
-            className="w-32 mx-2 text-center focus:outline-none text-white focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 bg-green-600 hover:bg-green-700 focus:ring-green-800"
-            onClick={handleCorrect}
-          >
-            Correct
-          </button>
-          <button
-            className="w-32 mx-2 focus:outline-none text-white focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 bg-red-600 hover:bg-red-700 focus:ring-red-900"
-            onClick={handleWrong}
-          >
-            Wrong
-          </button>
-          <button
-            className="w-32 mx-2 github-base-button"
-            onClick={clearLocalStorage}
-          >
-            Clear Cashe
-          </button>
-        </div>
+        {window.innerWidth >= 640 ? (
+          <div className="flex flex-row justify-center m-2">
+            <RefreshButton refreshPage={refreshPage} />
+            <CorrectButton handleCorrect={handleCorrect} />
+            <WrongButton handleWrong={handleWrong} />
+            <ClearCasheButton clearLocalStorage={clearLocalStorage} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 m-2 [&>*]:m-1">
+            <CorrectButton handleCorrect={handleCorrect} />
+            <WrongButton handleWrong={handleWrong} />
+            <RefreshButton refreshPage={refreshPage} />
+            <ClearCasheButton clearLocalStorage={clearLocalStorage} />
+          </div>
+        )}
 
         <div className="w-full py-4 h-16 flex items-center justify-center">
           <Accuracy accuracy={accuracy} coefficient={minAccuracyForCashe} />

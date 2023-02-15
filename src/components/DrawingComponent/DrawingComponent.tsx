@@ -3,7 +3,7 @@ import { Stage, Layer, Line } from "react-konva";
 import Konva from "konva";
 import PredictionContext from "../Context/PredictionContext";
 import PopupContext from "../Context/PopupContext";
-import userEvent from "@testing-library/user-event";
+import { isTouchScreenDevice, squeeze, getDistance } from "./Functions";
 
 interface DrawingProps {
   coefficient: number;
@@ -42,15 +42,6 @@ const Drawing = (props: DrawingProps) => {
       4
   );
 
-  const isTouchScreenDevice = () => {
-    try {
-      document.createEvent("TouchEvent");
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-
   useEffect(() => {
     // console.log('Num changed to:', num);
     if (stageRef.current && num === "") {
@@ -83,57 +74,6 @@ const Drawing = (props: DrawingProps) => {
       setActive((prev) => false);
       handleResolvedPrediction(prediction, sqData);
     }
-  }
-
-  function squeeze(data: Uint8ClampedArray): number[] {
-    const matrix: number[][] = [];
-    let buffer: number[] = [];
-    data.forEach((elem, i) => {
-      if (i % 4 === 0) {
-        if (i % (4 * size) === 0) {
-          if (buffer.length !== 0) matrix.push([...buffer]);
-          buffer = [];
-        }
-        buffer.push(elem / 256);
-      }
-    });
-    matrix.push(buffer);
-    buffer = [];
-    // console.log(matrix);
-
-    const step = Math.floor(size / sqSize);
-    console.log("Step:", step);
-
-    // matrix.forEach((line, i) => console.log(i, line));
-
-    const res: number[] = [];
-
-    for (let i = 0; i < sqSize; i++) {
-      for (let j = 0; j < sqSize; j++) {
-        let sum = 0;
-        const rowStart = Math.floor((i * size) / sqSize);
-        const colStart = Math.floor((j * size) / sqSize);
-        for (let k = rowStart; k < rowStart + step; k++) {
-          for (let l = colStart; l < colStart + step; l++) {
-            sum += matrix[k][l];
-          }
-        }
-        // console.log(sum);
-        res.push(sum / (step * step));
-      }
-    }
-
-    // console.log(res);
-
-    return res;
-  }
-
-  function getDistance(a: number[], b: number[]) {
-    let sum = 0;
-    for (let i = 0; i < a.length; i++) {
-      sum += Math.pow(a[i] - b[i], 2);
-    }
-    return Math.sqrt(sum);
   }
 
   function compareWithCashed(input: number[]): string {
@@ -198,7 +138,7 @@ const Drawing = (props: DrawingProps) => {
       const ctx = stageRef.current?.toCanvas().getContext("2d");
       if (ctx) {
         const data = ctx.getImageData(0, 0, size, size).data;
-        const sqData = squeeze(data);
+        const sqData = squeeze(data, size, sqSize);
         const fastPrediction = compareWithCashed(sqData);
         if (fastPrediction) {
           setNum((prev) => fastPrediction);
