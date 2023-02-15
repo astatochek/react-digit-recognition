@@ -160,10 +160,10 @@ const MainComponent = () => {
     <div className="w-full flex items-center justify-center">
       <div className="bg-gray-200 border-gray-300 dark:bg-github-dark-deep border dark:border-gray-200 rounded py-2 sm:py-6 px-4 sm:px-12 m-4 sm:my-12 shadow">
         <div className="flex flex-col sm:flex-row justify-center items-center m-3 sm:m-7">
-          <div className="touch-none w-60 h-60 bg-black dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 rounded-l">
+          <div className="touch-none w-60 h-60 bg-black dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 max-sm:rounded-t sm:rounded-l">
             <Drawing coefficient={minAccuracyForCashe} />
           </div>
-          <div className="w-60 h-60 text-mega-xl text-white bg-black  dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 text-center rounded-r">
+          <div className="w-60 h-60 text-18xl text-white bg-black  dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 text-center max-sm:rounded-b sm:rounded-r">
             {num}
           </div>
         </div>

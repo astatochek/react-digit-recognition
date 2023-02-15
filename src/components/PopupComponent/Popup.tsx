@@ -22,10 +22,10 @@ const PopupComponent = () => {
     <>
       {active && (
         <div className="h-screen w-screen bg-[rgba(0,0,0,0.7)] fixed left-0 top-0 flex justify-center items-center">
-          <div className="w-3/5 p-4 text-center border rounded-lg shadow sm:p-8 bg-white border-gray-200 dark:bg-github-dark-gray dark:border-gray-200">
+          <div className="w-3/5 p-4 text-center border rounded-lg shadow sm:p-8 bg-white border-gray-200 dark:bg-github-dark-deep dark:border-gray-200">
             <div className="flex flex-col sm:flex-row items-center justify-center">
               <LoadingComonent />
-              <h5 className="mb-2 text-2xl sm:text-4xl font-bold text-gray-800 dark:text-white text-center sm:text-left">
+              <h5 className="my-2 text-2xl sm:text-4xl font-bold text-gray-800 dark:text-white text-center sm:text-left">
                 connecting to{" "}
                 <a
                   href="https://huggingface.co/"
@@ -36,7 +36,7 @@ const PopupComponent = () => {
                 model
               </h5>
             </div>
-            <p className="my-3 tetx-xl sm:text-3xl text-gray-400">
+            <p className="my-3 tetx-xl sm:text-2xl text-gray-400">
               Please wait {delay}s
             </p>
           </div>

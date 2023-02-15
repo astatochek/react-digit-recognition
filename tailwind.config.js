@@ -6,7 +6,7 @@ module.exports = {
   theme: {
     extend: {
       fontSize: {
-        'mega-xl': ['16rem', '13rem'],
+        '18xl': ['16rem', '12.5rem'],
       },
       colors: {
         'github-dark-deep': '#010409',
