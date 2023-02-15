@@ -27,9 +27,6 @@ const Drawing = (props: DrawingProps) => {
 
   const sqSize = 24; // Squeezed Size
   const labels = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-  // const isDarkTheme = window.matchMedia(
-  //   "(prefers-color-scheme: light)"
-  // ).matches;
 
   const [lines, setLines] = useState<Point[]>([]);
   const isDrawing = useRef(false);
