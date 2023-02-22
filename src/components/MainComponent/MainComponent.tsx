@@ -6,7 +6,7 @@ import PopupComponent from "../PopupComponent/Popup";
 import RefreshButton from "./Buttons/Refresh";
 import CorrectButton from "./Buttons/Correct";
 import WrongButton from "./Buttons/Wrong";
-import ClearCasheButton from "./Buttons/ClearCashe";
+import ClearCacheButton from "./Buttons/ClearCache";
 
 const MainComponent = () => {
   const { num, setNum } = useContext(PredictionContext);
@@ -17,7 +17,7 @@ const MainComponent = () => {
     mustMakeRequest: boolean;
   }
 
-  const minAccuracyForCashe = 0.6;
+  const minAccuracyForCache = 0.6;
 
   interface AccuracyData {
     success: number;
@@ -31,10 +31,7 @@ const MainComponent = () => {
 
   const [accuracy, setAccuracy] = useState(0);
 
-  useEffect(() => {
-    initializeAccuracy();
-  }, [accuracy]);
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   function initializeAccuracy() {
     if (!localStorage.getItem("accuracy")) {
       localStorage.setItem(
@@ -44,13 +41,13 @@ const MainComponent = () => {
           failure: 0,
         })
       );
-      setAccuracy((prev) => 0);
+      setAccuracy(() => 0);
     } else {
       const storedAccuracy: AccuracyData = JSON.parse(
         localStorage.getItem("accuracy") || ""
       );
 
-      setAccuracy((prev) =>
+      setAccuracy(() =>
         storedAccuracy.success + storedAccuracy.failure === 0
           ? 0
           : (storedAccuracy.success /
@@ -59,6 +56,10 @@ const MainComponent = () => {
       );
     }
   }
+
+  useEffect(() => {
+    initializeAccuracy();
+  }, [accuracy, initializeAccuracy]);
 
   function updateAccuracy(success: boolean) {
     initializeAccuracy();
@@ -75,7 +76,7 @@ const MainComponent = () => {
 
     localStorage.setItem("accuracy", JSON.stringify(storedAccuracy));
 
-    setAccuracy((prev) =>
+    setAccuracy(() =>
       storedAccuracy.success + storedAccuracy.failure === 0
         ? 0
         : (storedAccuracy.success /
@@ -86,7 +87,7 @@ const MainComponent = () => {
 
   function clearLocalStorage() {
     localStorage.clear();
-    setAccuracy((prev) => 0);
+    setAccuracy(() => 0);
     console.log("LocalStorage:", localStorage);
     refreshPage();
   }
@@ -140,7 +141,7 @@ const MainComponent = () => {
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
       updateAccuracy(true);
-      setNum((prev) => "");
+      setNum(() => "");
     }
   }
 
@@ -152,7 +153,7 @@ const MainComponent = () => {
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
       updateAccuracy(false);
-      setNum((prev) => "");
+      setNum(() => "");
     }
   }
 
@@ -161,7 +162,7 @@ const MainComponent = () => {
       <div className="bg-gray-200 border-gray-300 dark:bg-github-dark-deep border dark:border-gray-200 rounded py-2 sm:py-6 px-4 sm:px-12 m-4 sm:my-12 shadow">
         <div className="flex flex-col sm:flex-row justify-center items-center m-3 sm:m-7">
           <div className="touch-none w-60 h-60 bg-black dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 max-sm:rounded-t sm:rounded-l">
-            <Drawing coefficient={minAccuracyForCashe} />
+            <Drawing coefficient={minAccuracyForCache} />
           </div>
           <div className="w-60 h-60 text-18xl text-white bg-black  dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 text-center max-sm:rounded-b sm:rounded-r">
             {num}
@@ -173,19 +174,19 @@ const MainComponent = () => {
             <RefreshButton refreshPage={refreshPage} />
             <CorrectButton handleCorrect={handleCorrect} />
             <WrongButton handleWrong={handleWrong} />
-            <ClearCasheButton clearLocalStorage={clearLocalStorage} />
+            <ClearCacheButton clearLocalStorage={clearLocalStorage} />
           </div>
         ) : (
           <div className="grid grid-cols-2 m-2 [&>*]:m-1">
             <CorrectButton handleCorrect={handleCorrect} />
             <WrongButton handleWrong={handleWrong} />
             <RefreshButton refreshPage={refreshPage} />
-            <ClearCasheButton clearLocalStorage={clearLocalStorage} />
+            <ClearCacheButton clearLocalStorage={clearLocalStorage} />
           </div>
         )}
 
         <div className="w-full flex flex-col items-center justify-start mt-6">
-          <Accuracy accuracy={accuracy} coefficient={minAccuracyForCashe} />
+          <Accuracy accuracy={accuracy} coefficient={minAccuracyForCache} />
         </div>
 
         <PopupComponent />

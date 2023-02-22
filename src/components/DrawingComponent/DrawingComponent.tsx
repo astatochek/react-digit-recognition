@@ -148,7 +148,7 @@ const Drawing = (props: DrawingProps) => {
           );
           // addItemToLocalStorage(sqData, fastPrediction);
         } else {
-          getPrediction(blob, sqData);
+          await getPrediction(blob, sqData);
         }
       }
     }
