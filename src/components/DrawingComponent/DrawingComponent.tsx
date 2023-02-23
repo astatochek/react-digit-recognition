@@ -52,7 +52,7 @@ const Drawing = (props: DrawingProps) => {
       "https://api-inference.huggingface.co/models/farleyknight-org-username/vit-base-mnist",
       {
         headers: {
-          Authorization: "Bearer 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",
+          Authorization: "Bearer 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",
         },
         method: "POST",
         body: data,
