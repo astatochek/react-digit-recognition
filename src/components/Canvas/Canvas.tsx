@@ -67,14 +67,12 @@ const Drawing = (props: DrawingProps) => {
 
     if (!res.ok) {
       setTimeout(() => {
-        setActive(() => true);
         getPrediction(data, sqData);
       }, 1000);
     } else {
       const body = await res.json();
       console.log("Response Data:");
       console.table(body);
-      setActive(() => false);
       handleResolvedPrediction(body, sqData);
     }
   }
@@ -259,6 +257,7 @@ const Drawing = (props: DrawingProps) => {
   }
 
   const handleExport = async () => {
+    setActive(() => true);
     if (stageRef.current) {
       // console.log(stageRef.current.toDataURL());
       const blob = await stageRef.current.toBlob();
@@ -268,6 +267,7 @@ const Drawing = (props: DrawingProps) => {
         const sqData = squeeze(data, size, sqSize);
         const fastPrediction = compareWithCashed(sqData);
         if (fastPrediction.ok) {
+          setActive(() => false);
           setPrediction(() => fastPrediction);
           localStorage.setItem(
             "pending",
@@ -293,6 +293,7 @@ const Drawing = (props: DrawingProps) => {
       label: prediction[0].label,
       data: prediction,
     };
+    setActive(() => false);
     setPrediction(() => newPrediction);
     localStorage.setItem(
       "pending",

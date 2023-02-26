@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import PredictionContext from "../../Context/PredictionContext";
 import DistributionComponent from "../Distribution/Distribution";
-import { PredictionDataType } from "../../Context/PredictionContext";
+import LoadingComonent from "./Loading/Loading";
 
 export default function PredictionComponent() {
   const [onHover, setOnHover] = useState<boolean>(false);
@@ -31,7 +31,7 @@ export default function PredictionComponent() {
             </div>
           )}
         </div>
-      ) : <div className="w-60 h-60"></div>}
+      ) : <div className="w-60 h-60"><LoadingComonent /></div>}
     </>
   );
 }

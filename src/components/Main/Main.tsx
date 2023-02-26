@@ -1,13 +1,13 @@
 import React, { useContext, useState, useEffect } from "react";
 import Drawing from "../Canvas/Canvas";
 import PredictionContext, { PredictionDataType } from "../Context/PredictionContext";
-import PopupComponent from "../PopupComponent/Popup";
 import CardComponent from "./Card/Card";
 import PredictionComponent from "./Prediction/Prediction";
 import ButtonComponent from "./Button/Button";
 
 const MainComponent = () => {
   const { prediction, setPrediction } = useContext(PredictionContext);
+
 
   interface LocalStorageItem {
     average: number[];
@@ -42,7 +42,7 @@ const MainComponent = () => {
           failure: 0,
         })
       );
-      setAccuracy((prev) => 0);
+      setAccuracy(() => 0);
     } else {
       const storedAccuracy: AccuracyData = JSON.parse(
         localStorage.getItem("accuracy") || ""
@@ -73,7 +73,7 @@ const MainComponent = () => {
 
     localStorage.setItem("accuracy", JSON.stringify(storedAccuracy));
 
-    setAccuracy((prev) =>
+    setAccuracy(() =>
       storedAccuracy.success + storedAccuracy.failure === 0
         ? 0
         : (storedAccuracy.success /

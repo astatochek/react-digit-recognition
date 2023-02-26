@@ -1,0 +1,28 @@
+#loading-icon {
+  width: 100%;
+}
+
+.animated-block {
+  animation: animated-block 1s linear infinite;
+  width: 80%;
+  height: 80%;
+}
+
+@keyframes animated-block {
+  /* from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  } */
+}
+
+.spinner {
+  transform-origin: center;
+  animation: spinner 0.75s infinite linear;
+}
+@keyframes spinner {
+  100% {
+    transform: rotate(360deg);
+  }
+}
