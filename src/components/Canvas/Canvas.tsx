@@ -10,7 +10,7 @@ interface DrawingProps {
   coefficient: number;
 }
 
-const Drawing = (props: DrawingProps) => {
+export default function CanvasComponent(props: DrawingProps) {
   class Point {
     points: number[] = [];
   }
@@ -47,6 +47,8 @@ const Drawing = (props: DrawingProps) => {
       layers.forEach((layer) => layer.destroyChildren());
     }
   }, [prediction]);
+
+  //                           HANDLE CANVAS INFO AND MAKE PREDICTION(S)
 
   /**
    * Requests a prediction from huggingface.co
@@ -87,12 +89,12 @@ const Drawing = (props: DrawingProps) => {
     let threshold = 1e-247; // :)
     let numOfCached = 0;
     let distances: number[] = []; // length = 10
-    console.log("Started Calculating Distances");
+    // console.log("Started Calculating Distances");
     labels.forEach((label) => {
       const rawItem = localStorage.getItem(label);
       if (rawItem) {
         const item: LocalStorageItem = JSON.parse(rawItem);
-        console.log("Label:", label, "Item:", item);
+        // console.log("Label:", label, "Item:", item);
         distances.push(getDistance(input, item.average));
         numOfCached++;
       } else {
@@ -104,8 +106,8 @@ const Drawing = (props: DrawingProps) => {
       threshold = 0.1;
     }
 
-    console.log("Finished Calculating Distances");
-    console.log("Raw Distances", distances);
+    // console.log("Finished Calculating Distances");
+    // console.log("Raw Distances", distances);
 
     let sum = 0;
     distances.forEach((elem) => {
@@ -114,11 +116,9 @@ const Drawing = (props: DrawingProps) => {
 
     distances = distances.map((elem) => Math.exp(elem) / sum);
 
-    console.log("Simplexed Distances:", distances);
+    // console.log("Simplexed Distances:", distances);
 
     const fastPrediction = distances.indexOf(Math.min(...distances));
-
-    // console.log("LocalStorage:", localStorage);
 
     const storedAccuracy: AccuracyData = JSON.parse(
       localStorage.getItem("accuracy") || ""
@@ -142,25 +142,25 @@ const Drawing = (props: DrawingProps) => {
       distances[fastPrediction] <= threshold &&
       successCoefficient > props.coefficient
     ) {
-      console.log(`Threshold Passed: ${distances[fastPrediction]} <= ${threshold}`);
+      console.log(
+        `Threshold Passed: ${distances[fastPrediction]} <= ${threshold}`
+      );
       const res = preparePredictionFromDistances(distances);
-      console.log("Cached Prediction Data:");
-      console.table(res.data);
+      // console.log("Cached Prediction Data:");
+      // console.table(res.data);
       return res;
     }
 
     return { ok: false, label: "", data: [] };
   }
 
-  const isTouchScreenDevice = () => {
-    try {
-      document.createEvent("TouchEvent");
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-
+  /**
+   * Sqeezes an array `data` from canvas data to an array of specified length
+   * @param data special type of array, used to store pixel info in canvas
+   * @param size size of canvas in pixels (calculated from `rem` value)
+   * @param sqSize square root of sqeezed array
+   * @returns array of size `sqData x sqData`
+   */
   function squeeze(
     data: Uint8ClampedArray,
     size: number,
@@ -179,11 +179,8 @@ const Drawing = (props: DrawingProps) => {
     });
     matrix.push(buffer);
     buffer = [];
-    // console.log(matrix);
 
     const step = Math.floor(size / sqSize);
-
-    // matrix.forEach((line, i) => console.log(i, line));
 
     const res: number[] = [];
 
@@ -197,16 +194,19 @@ const Drawing = (props: DrawingProps) => {
             sum += matrix[k][l];
           }
         }
-        // console.log(sum);
         res.push(sum / (step * step));
       }
     }
 
-    // console.log(res);
-
     return res;
   }
 
+  /**
+   * Calculates Euclidiaan distance between 2 arrays of same length
+   * @param a array of numbers from 0 to 1 of length: `sqSize x sqSize`
+   * @param b same as `a`
+   * @returns a number from 0 to `sqSize x sqSize` (for some reason...)
+   */
   function getDistance(a: number[], b: number[]) {
     let sum = 0;
     for (let i = 0; i < a.length; i++) {
@@ -218,23 +218,26 @@ const Drawing = (props: DrawingProps) => {
     return Math.sqrt(sum);
   }
 
+  /**
+   * From calculated using Cache distances prepares top-5 predictions if possible
+   * @param distances array of numbers from 0 to 1 of length `sqSize x sqSize`
+   * @param length (5 by default) length of output array
+   * @returns object of type PredictionDataType, containing status, final prediction and top-5
+   */
   function preparePredictionFromDistances(
     distances: number[],
-    lenght: number = 5
+    length: number = 5
   ): PredictionDataType {
     try {
       let distancesWithLabels = distances.map((distance, i) => {
         const elem = { score: distance, label: `${i}` };
         return elem;
       });
-      // console.log("Distances With Labels:");
-      // console.table(distancesWithLabels);
-      distancesWithLabels = distancesWithLabels.sort((a, b) => a.score - b.score);
-      // console.log("Distances With Labels Sorted:");
-      // console.table(distancesWithLabels);
-      distancesWithLabels = distancesWithLabels.slice(0, lenght);
-      // console.log("Distances With Labels Sorted Top 5:");
-      // console.table(distancesWithLabels);
+
+      distancesWithLabels = distancesWithLabels.sort(
+        (a, b) => a.score - b.score
+      );
+      distancesWithLabels = distancesWithLabels.slice(0, length);
 
       let sum = 0;
       distancesWithLabels.forEach(({ score }) => {
@@ -242,7 +245,7 @@ const Drawing = (props: DrawingProps) => {
       });
 
       distancesWithLabels = distancesWithLabels.map(({ score, label }) => {
-        return { score: (1 / score) / sum, label: label };
+        return { score: 1 / score / sum, label: label };
       });
 
       return {
@@ -256,10 +259,15 @@ const Drawing = (props: DrawingProps) => {
     }
   }
 
+  /**
+   * Gets info from canvas, prepares squeezed array of pixel data,
+   * makes a fast prediction using Cached data, calls function to
+   * make request to `huggingface.co` if fast predictions is considered
+   * invalid; sets up loading spinner.
+   */
   const handleExport = async () => {
     setActive(() => true);
     if (stageRef.current) {
-      // console.log(stageRef.current.toDataURL());
       const blob = await stageRef.current.toBlob();
       const ctx = stageRef.current?.toCanvas().getContext("2d");
       if (ctx) {
@@ -267,16 +275,7 @@ const Drawing = (props: DrawingProps) => {
         const sqData = squeeze(data, size, sqSize);
         const fastPrediction = compareWithCashed(sqData);
         if (fastPrediction.ok) {
-          setActive(() => false);
-          setPrediction(() => fastPrediction);
-          localStorage.setItem(
-            "pending",
-            JSON.stringify({
-              squeezed: sqData,
-              prediction: fastPrediction,
-            })
-          );
-          // addItemToLocalStorage(sqData, fastPrediction);
+          handleResolvedPrediction(fastPrediction.data, sqData);
         } else {
           getPrediction(blob, sqData);
         }
@@ -284,6 +283,13 @@ const Drawing = (props: DrawingProps) => {
     }
   };
 
+  /**
+   * From top-5 predictions and squeezed array of pixel data
+   * deactivates loading spinner, updates PredictionContext and
+   * sets new prediction as `pending` for user to respond
+   * @param prediction array of top-5 predictions
+   * @param sqData squeezed array of pixel data from canvas
+   */
   function handleResolvedPrediction(
     prediction: { score: number; label: string }[],
     sqData: number[]
@@ -304,44 +310,82 @@ const Drawing = (props: DrawingProps) => {
     );
   }
 
-  const handleMouseDownEvent = (e: any) => {
-    if (isTouchScreenDevice()) return;
-    handleMouseDown(e);
+  //                                HANDLE INTERACTIONS WITH CANVAS
+
+  /**
+   * Checks if the device is Touch Screen type
+   * @returns `true` if that is the case
+   */
+  const isTouchScreenDeviceCheck = () => {
+    try {
+      document.createEvent("TouchEvent");
+      return true;
+    } catch (e) {
+      return false;
+    }
   };
 
+  const isTouchScreenDevice = isTouchScreenDeviceCheck();
+
+  /**
+   * Prevents the redundant call of `startDrawing`
+   * @param e event object
+   */
   const handleMouseDown = (e: any) => {
+    if (!isTouchScreenDevice) startDrawing(e);
+  };
+
+  /**
+   * Permits further interaction with Canvas, draws the currents position of the pointer
+   * @param e event object
+   */
+  const startDrawing = (e: any) => {
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
     setLines([...lines, { points: [pos.x, pos.y] }]);
   };
 
-  const handleMouseMoveEvent = (e: any) => {
-    if (isTouchScreenDevice()) return;
-    handleMouseMove(e);
+  /**
+   * Prevents the redundant call of `continueDrawing`
+   * @param e event object
+   */
+  const handleMouseMove = (e: any) => {
+    if (!isTouchScreenDevice) continueDrawing(e);
   };
 
-  const handleMouseMove = (e: any) => {
-    // no drawing - skipping
-    if (!isDrawing.current) {
-      return;
-    }
+  /**
+   * If interaction with Canvas is permitted draws the current pinter
+   * position and a line, connecting it with the previous one
+   * @param e event object
+   * @returns
+   */
+  const continueDrawing = (e: any) => {
+
+    if (!isDrawing.current) return;
+
     const stage = e.target.getStage();
     const point = stage.getPointerPosition();
     let lastLine = lines[lines.length - 1];
-    // add point
+
     lastLine.points = lastLine.points.concat([point.x, point.y]);
 
-    // replace last
     lines.splice(lines.length - 1, 1, lastLine);
     setLines(lines.concat());
   };
 
-  const handleMouseUpEvent = () => {
-    if (isTouchScreenDevice()) return;
-    handleMouseUp();
+  /**
+   * Prevents the redundant call of `finishDrawing`
+   */
+  const handleMouseUp = () => {
+    if (!isTouchScreenDevice) finishDrawing();
   };
 
-  const handleMouseUp = () => {
+  /**
+   * Prohibits further interaction with Canvas;
+   * calls `handleExport` to get the pixel data
+   * from Canvas and make prediction(s)
+   */
+  const finishDrawing = () => {
     isDrawing.current = false;
     handleExport();
   };
@@ -353,12 +397,12 @@ const Drawing = (props: DrawingProps) => {
       <Stage
         width={size}
         height={size}
-        onMouseDown={handleMouseDownEvent}
-        onMouseMove={handleMouseMoveEvent}
-        onMouseUp={handleMouseUpEvent}
-        onTouchStart={handleMouseDown}
-        onTouchMove={handleMouseMove}
-        onTouchEnd={handleMouseUp}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onTouchStart={startDrawing}
+        onTouchMove={continueDrawing}
+        onTouchEnd={continueDrawing}
         ref={stageRef}
       >
         <Layer>
@@ -379,5 +423,3 @@ const Drawing = (props: DrawingProps) => {
     </>
   );
 };
-
-export default Drawing;

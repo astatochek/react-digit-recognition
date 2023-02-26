@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from "react";
-import Drawing from "../Canvas/Canvas";
+import CanvasComponent from "../Canvas/Canvas";
 import PredictionContext, {
   PredictionDataType,
 } from "../Context/PredictionContext";
@@ -171,7 +171,7 @@ const MainComponent = () => {
         </div>
         <div className="flex flex-col sm:flex-row items-stretch">
           <CardComponent border="border-magenta-tint-10">
-            <Drawing coefficient={minAccuracyForCashe} />
+            <CanvasComponent coefficient={minAccuracyForCashe} />
           </CardComponent>
           <CardComponent border="border-brand-purple-tint-20">
             <PredictionComponent />
