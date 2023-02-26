@@ -1,13 +1,14 @@
 import React, { useContext, useState, useEffect } from "react";
 import Drawing from "../Canvas/Canvas";
-import PredictionContext, { PredictionDataType } from "../Context/PredictionContext";
+import PredictionContext, {
+  PredictionDataType,
+} from "../Context/PredictionContext";
 import CardComponent from "./Card/Card";
 import PredictionComponent from "./Prediction/Prediction";
 import ButtonComponent from "./Button/Button";
 
 const MainComponent = () => {
   const { prediction, setPrediction } = useContext(PredictionContext);
-
 
   interface LocalStorageItem {
     average: number[];
@@ -137,11 +138,7 @@ const MainComponent = () => {
     const rawPending = localStorage.getItem("pending");
     if (rawPending) {
       const pending: PendingPrediction = JSON.parse(rawPending);
-      addItemToLocalStorage(
-        pending.squeezed,
-        pending.prediction.label,
-        false
-      );
+      addItemToLocalStorage(pending.squeezed, pending.prediction.label, false);
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
       updateAccuracy(true);
@@ -166,10 +163,12 @@ const MainComponent = () => {
   }
 
   return (
-    <>
+    <div className="overflow-hidden relative main-container">
       <div className="radial-gradient-magenta-tint-20 top-[-1032px] left-[-101px] md:top-[-746px] md:left-[-130px]"></div>
-      <div className="w-full flex flex-col items-center justify-center pt-20 px-20 relative">
-        <div className="title-text text-3xl sm:text-7xl">React-Digit-Recognition</div>
+      <div className="w-full flex flex-col items-center justify-center pt-5 sm:pt-20 px-20 relative">
+        <div className="title-text text-3xl sm:text-7xl">
+          React-Digit-Recognition
+        </div>
         <div className="flex flex-col sm:flex-row items-stretch">
           <CardComponent border="border-magenta-tint-10">
             <Drawing coefficient={minAccuracyForCashe} />
@@ -179,13 +178,33 @@ const MainComponent = () => {
           </CardComponent>
         </div>
         <div className="flex flex-row justify-center items-center">
-          <ButtonComponent classNames="border-magenta-tint-10" text="Clear Canvas" handler={clearCanvas}/>
-          <ButtonComponent classNames="border-cyan-tint-20" text="Correct" handler={handleCorrect}/>
-          <ButtonComponent classNames="border-flamingo-tint-20" text="Wrong" handler={handleWrong}/>
-          <ButtonComponent classNames="border-brand-purple-tint-20" text="Clear Cache" handler={clearLocalStorage}/>
+          <div className="flex flex-col-reverse sm:flex-row justify-center items-center">
+          <ButtonComponent
+            classNames="border-magenta-tint-10"
+            text="Clear Canvas"
+            handler={clearCanvas}
+          />
+          <ButtonComponent
+            classNames="border-cyan-tint-20"
+            text="Correct"
+            handler={handleCorrect}
+          />
+          </div>
+          <div className="flex flex-col sm:flex-row justify-center items-center">
+          <ButtonComponent
+            classNames="border-flamingo-tint-20"
+            text="Wrong"
+            handler={handleWrong}
+          />
+          <ButtonComponent
+            classNames="border-brand-purple-tint-20"
+            text="Clear Cache"
+            handler={clearLocalStorage}
+          />
+          </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
