@@ -81,7 +81,7 @@ export default function CanvasComponent(props: DrawingProps) {
 
   /**
    * Compares giver array with size `sqSize x sqSize` with cached averages,
-   * stored in LocalStorage with lebels as `key` and type `LocalStorageItem`
+   * stored in LocalStorage with labels as `key` and type `LocalStorageItem`
    * @param input squeezed array to compare with cached averages
    * @returns prediction as in `PredictionContext`
    */
@@ -116,7 +116,7 @@ export default function CanvasComponent(props: DrawingProps) {
 
     distances = distances.map((elem) => Math.exp(elem) / sum);
 
-    // console.log("Simplexed Distances:", distances);
+    // console.log("Distances as Probability Values:", distances);
 
     const fastPrediction = distances.indexOf(Math.min(...distances));
 
@@ -155,10 +155,10 @@ export default function CanvasComponent(props: DrawingProps) {
   }
 
   /**
-   * Sqeezes an array `data` from canvas data to an array of specified length
+   * Squeezes an array `data` from canvas data to an array of specified length
    * @param data special type of array, used to store pixel info in canvas
    * @param size size of canvas in pixels (calculated from `rem` value)
-   * @param sqSize square root of sqeezed array
+   * @param sqSize square root of squeezed array
    * @returns array of size `sqData x sqData`
    */
   function squeeze(
@@ -202,7 +202,7 @@ export default function CanvasComponent(props: DrawingProps) {
   }
 
   /**
-   * Calculates Euclidiaan distance between 2 arrays of same length
+   * Calculates Euclidean distance between 2 arrays of same length
    * @param a array of numbers from 0 to 1 of length: `sqSize x sqSize`
    * @param b same as `a`
    * @returns a number from 0 to `sqSize x sqSize` (for some reason...)
