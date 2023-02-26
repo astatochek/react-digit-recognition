@@ -3,12 +3,36 @@
 @tailwind utilities;
 
 body {
-  @apply dark:bg-github-dark-gray dark:text-white;
   font-family: "Segoe UI", sans-serif;
+  overflow-x: hidden;
+  @apply bg-neutrals-additionals-grey-12 text-white;
+  
 }
 
 @layer components {
   .github-base-button {
     @apply text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700;
+  }
+
+  .title-text {
+    font-family: "Space Grotesk", sans-serif;
+  }
+
+  .regular-text {
+    font-family: "Open Sans", sans-serif;
+  }
+
+  .radial-gradient-magenta-tint-20 {
+    background: radial-gradient(
+      106.35% 149.92% at -20.09% 20.04%,
+      rgba(214, 0, 170, 0.2) 1.43%,
+      rgba(214, 0, 170, 0) 100%
+    );
+    width: 1193.39px;
+    height: 1383.78px;
+    opacity: 0.8;
+    transform: rotate(33.28deg);
+    position: absolute;
+    z-index: -50;
   }
 }

@@ -1,15 +1,13 @@
 import React, { useContext, useState, useEffect } from "react";
-import Drawing from "../DrawingComponent/DrawingComponent";
-import Accuracy from "../AccuracyComponent/Accuracy";
-import PredictionContext from "../Context/PredictionContext";
+import Drawing from "../Canvas/Canvas";
+import PredictionContext, { PredictionDataType } from "../Context/PredictionContext";
 import PopupComponent from "../PopupComponent/Popup";
-import RefreshButton from "./Buttons/Refresh";
-import CorrectButton from "./Buttons/Correct";
-import WrongButton from "./Buttons/Wrong";
-import ClearCacheButton from "./Buttons/ClearCache";
+import CardComponent from "./Card/Card";
+import PredictionComponent from "./Prediction/Prediction";
+import ButtonComponent from "./Button/Button";
 
 const MainComponent = () => {
-  const { num, setNum } = useContext(PredictionContext);
+  const { prediction, setPrediction } = useContext(PredictionContext);
 
   interface LocalStorageItem {
     average: number[];
@@ -17,21 +15,24 @@ const MainComponent = () => {
     mustMakeRequest: boolean;
   }
 
-  const minAccuracyForCache = 0.6;
+  const minAccuracyForCashe = 0.6;
 
   interface AccuracyData {
     success: number;
     failure: number;
   }
 
-  interface PendingPrediction {
+  type PendingPrediction = {
     squeezed: number[];
-    label: string;
-  }
+    prediction: PredictionDataType;
+  };
 
   const [accuracy, setAccuracy] = useState(0);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    initializeAccuracy();
+  }, [accuracy]);
+
   function initializeAccuracy() {
     if (!localStorage.getItem("accuracy")) {
       localStorage.setItem(
@@ -41,13 +42,13 @@ const MainComponent = () => {
           failure: 0,
         })
       );
-      setAccuracy(() => 0);
+      setAccuracy((prev) => 0);
     } else {
       const storedAccuracy: AccuracyData = JSON.parse(
         localStorage.getItem("accuracy") || ""
       );
 
-      setAccuracy(() =>
+      setAccuracy((prev) =>
         storedAccuracy.success + storedAccuracy.failure === 0
           ? 0
           : (storedAccuracy.success /
@@ -56,10 +57,6 @@ const MainComponent = () => {
       );
     }
   }
-
-  useEffect(() => {
-    initializeAccuracy();
-  }, [accuracy, initializeAccuracy]);
 
   function updateAccuracy(success: boolean) {
     initializeAccuracy();
@@ -76,7 +73,7 @@ const MainComponent = () => {
 
     localStorage.setItem("accuracy", JSON.stringify(storedAccuracy));
 
-    setAccuracy(() =>
+    setAccuracy((prev) =>
       storedAccuracy.success + storedAccuracy.failure === 0
         ? 0
         : (storedAccuracy.success /
@@ -87,13 +84,16 @@ const MainComponent = () => {
 
   function clearLocalStorage() {
     localStorage.clear();
-    setAccuracy(() => 0);
+    initializeAccuracy();
     console.log("LocalStorage:", localStorage);
-    refreshPage();
+    clearCanvas();
   }
 
-  function refreshPage() {
-    window.location.reload();
+  function clearCanvas() {
+    // window.location.reload();
+    setPrediction(() => {
+      return { ok: false, label: "", data: [] };
+    });
   }
 
   function getAverage(input: number[], base: number[], num: number): number[] {
@@ -137,11 +137,17 @@ const MainComponent = () => {
     const rawPending = localStorage.getItem("pending");
     if (rawPending) {
       const pending: PendingPrediction = JSON.parse(rawPending);
-      addItemToLocalStorage(pending.squeezed, pending.label, false);
+      addItemToLocalStorage(
+        pending.squeezed,
+        pending.prediction.label,
+        false
+      );
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
       updateAccuracy(true);
-      setNum(() => "");
+      setPrediction(() => {
+        return { ok: false, label: "", data: [] };
+      });
     }
   }
 
@@ -149,49 +155,37 @@ const MainComponent = () => {
     const rawPending = localStorage.getItem("pending");
     if (rawPending) {
       const pending: PendingPrediction = JSON.parse(rawPending);
-      addItemToLocalStorage([], pending.label, true);
+      addItemToLocalStorage([], pending.prediction.label, true);
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
       updateAccuracy(false);
-      setNum(() => "");
+      setPrediction(() => {
+        return { ok: false, label: "", data: [] };
+      });
     }
   }
 
   return (
-    <div className="w-full flex items-center justify-center">
-      <div className="bg-gray-200 border-gray-300 dark:bg-github-dark-deep border dark:border-gray-200 rounded py-2 sm:py-6 px-4 sm:px-12 m-4 sm:my-12 shadow">
-        <div className="flex flex-col sm:flex-row justify-center items-center m-3 sm:m-7">
-          <div className="touch-none w-60 h-60 bg-black dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 max-sm:rounded-t sm:rounded-l">
-            <Drawing coefficient={minAccuracyForCache} />
-          </div>
-          <div className="w-60 h-60 text-18xl text-white bg-black  dark:bg-github-dark-gray border border-gray-900 dark:border-gray-200 text-center max-sm:rounded-b sm:rounded-r">
-            {num}
-          </div>
+    <>
+      <div className="radial-gradient-magenta-tint-20 top-[-1032px] left-[-101px] md:top-[-746px] md:left-[-130px]"></div>
+      <div className="w-full flex flex-col items-center justify-center pt-20 px-20 relative">
+        <div className="title-text text-3xl sm:text-7xl">React-Digit-Recognition</div>
+        <div className="flex flex-col sm:flex-row items-stretch">
+          <CardComponent border="border-magenta-tint-10">
+            <Drawing coefficient={minAccuracyForCashe} />
+          </CardComponent>
+          <CardComponent border="border-brand-purple-tint-20">
+            <PredictionComponent />
+          </CardComponent>
         </div>
-
-        {window.innerWidth >= 640 ? (
-          <div className="flex flex-row justify-center m-2">
-            <RefreshButton refreshPage={refreshPage} />
-            <CorrectButton handleCorrect={handleCorrect} />
-            <WrongButton handleWrong={handleWrong} />
-            <ClearCacheButton clearLocalStorage={clearLocalStorage} />
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 m-2 [&>*]:m-1">
-            <CorrectButton handleCorrect={handleCorrect} />
-            <WrongButton handleWrong={handleWrong} />
-            <RefreshButton refreshPage={refreshPage} />
-            <ClearCacheButton clearLocalStorage={clearLocalStorage} />
-          </div>
-        )}
-
-        <div className="w-full flex flex-col items-center justify-start mt-6">
-          <Accuracy accuracy={accuracy} coefficient={minAccuracyForCache} />
+        <div className="flex flex-row justify-center items-center">
+          <ButtonComponent classNames="border-magenta-tint-10" text="Clear Canvas" handler={clearCanvas}/>
+          <ButtonComponent classNames="border-cyan-tint-20" text="Correct" handler={handleCorrect}/>
+          <ButtonComponent classNames="border-flamingo-tint-20" text="Wrong" handler={handleWrong}/>
+          <ButtonComponent classNames="border-brand-purple-tint-20" text="Clear Cache" handler={clearLocalStorage}/>
         </div>
-
-        <PopupComponent />
       </div>
-    </div>
+    </>
   );
 };
 
