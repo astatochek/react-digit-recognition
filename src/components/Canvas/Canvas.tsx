@@ -73,8 +73,8 @@ export default function CanvasComponent(props: DrawingProps) {
       }, 1000);
     } else {
       const body = await res.json();
-      console.log("Response Data:");
-      console.table(body);
+      // console.log("Response Data:");
+      // console.table(body);
       handleResolvedPrediction(body, sqData);
     }
   }
@@ -129,7 +129,7 @@ export default function CanvasComponent(props: DrawingProps) {
         : storedAccuracy.success /
           (storedAccuracy.success + storedAccuracy.failure);
 
-    console.table(storedAccuracy);
+    // console.table(storedAccuracy);
 
     if (localStorage.getItem(labels[fastPrediction])) {
       const item: LocalStorageItem = JSON.parse(
@@ -142,9 +142,9 @@ export default function CanvasComponent(props: DrawingProps) {
       distances[fastPrediction] <= threshold &&
       successCoefficient > props.coefficient
     ) {
-      console.log(
-        `Threshold Passed: ${distances[fastPrediction]} <= ${threshold}`
-      );
+      // console.log(
+      //   `Threshold Passed: ${distances[fastPrediction]} <= ${threshold}`
+      // );
       const res = preparePredictionFromDistances(distances);
       // console.log("Cached Prediction Data:");
       // console.table(res.data);
@@ -402,7 +402,7 @@ export default function CanvasComponent(props: DrawingProps) {
         onMouseUp={handleMouseUp}
         onTouchStart={startDrawing}
         onTouchMove={continueDrawing}
-        onTouchEnd={continueDrawing}
+        onTouchEnd={finishDrawing}
         ref={stageRef}
       >
         <Layer>

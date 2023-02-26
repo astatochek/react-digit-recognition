@@ -99,7 +99,7 @@ const MainComponent = () => {
   function clearLocalStorage() {
     localStorage.clear();
     initializeAccuracy();
-    console.log("LocalStorage:", localStorage);
+    // console.log("LocalStorage:", localStorage);
     clearCanvas();
   }
 
@@ -185,7 +185,7 @@ const MainComponent = () => {
       }
 
       localStorage.removeItem("pending");
-      console.log("LocalStorage:", localStorage);
+      // console.log("LocalStorage:", localStorage);
       updateAccuracy(isCorrect);
       setPrediction(() => {
         return { ok: false, label: "", data: [] };
