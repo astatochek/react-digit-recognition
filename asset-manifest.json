@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/react-digit-recognition/static/css/main.91ce7d16.css",
-    "main.js": "/react-digit-recognition/static/js/main.f2361d5d.js",
+    "main.css": "/react-digit-recognition/static/css/main.9b269cfa.css",
+    "main.js": "/react-digit-recognition/static/js/main.43edcfd2.js",
     "index.html": "/react-digit-recognition/index.html",
-    "main.91ce7d16.css.map": "/react-digit-recognition/static/css/main.91ce7d16.css.map",
-    "main.f2361d5d.js.map": "/react-digit-recognition/static/js/main.f2361d5d.js.map"
+    "main.9b269cfa.css.map": "/react-digit-recognition/static/css/main.9b269cfa.css.map",
+    "main.43edcfd2.js.map": "/react-digit-recognition/static/js/main.43edcfd2.js.map"
   },
   "entrypoints": [
-    "static/css/main.91ce7d16.css",
-    "static/js/main.f2361d5d.js"
+    "static/css/main.9b269cfa.css",
+    "static/js/main.43edcfd2.js"
   ]
 }
