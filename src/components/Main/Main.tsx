@@ -16,7 +16,7 @@ const MainComponent = () => {
     mustMakeRequest: boolean;
   }
 
-  const minAccuracyForCashe = 0.6;
+  const minAccuracyForCache = 0.6;
 
   interface AccuracyData {
     success: number;
@@ -34,6 +34,11 @@ const MainComponent = () => {
     initializeAccuracy();
   }, [accuracy]);
 
+  //               INTERACTION WITH LOCAL STORAGE AFTER USER'S INTERACTION WITH BUTTONS
+
+  /**
+   * Sets accuracy at 0 : 0 by default, otherwise - with values from LocalStorage
+   */
   function initializeAccuracy() {
     if (!localStorage.getItem("accuracy")) {
       localStorage.setItem(
@@ -49,7 +54,7 @@ const MainComponent = () => {
         localStorage.getItem("accuracy") || ""
       );
 
-      setAccuracy((prev) =>
+      setAccuracy(() =>
         storedAccuracy.success + storedAccuracy.failure === 0
           ? 0
           : (storedAccuracy.success /
@@ -59,6 +64,11 @@ const MainComponent = () => {
     }
   }
 
+  /**
+   * Updates `accuracy`'s state and as a LocalStorage item with
+   * accordance to the user's evaluation of the prediction
+   * @param success
+   */
   function updateAccuracy(success: boolean) {
     initializeAccuracy();
 
@@ -83,6 +93,9 @@ const MainComponent = () => {
     );
   }
 
+  /**
+   * Clears LocalStorage, re-initializes accuracy and clears Canvas
+   */
   function clearLocalStorage() {
     localStorage.clear();
     initializeAccuracy();
@@ -90,6 +103,9 @@ const MainComponent = () => {
     clearCanvas();
   }
 
+  /**
+   * Clears Canvas by resetting the PredictionContext to default values
+   */
   function clearCanvas() {
     // window.location.reload();
     setPrediction(() => {
@@ -97,6 +113,13 @@ const MainComponent = () => {
     });
   }
 
+  /**
+   * Calculates average between the previous average and a new array of pixel values
+   * @param input new array of numbers from 0 to 1 of length `sqSize x sqSize`
+   * @param base previous average with same characteristics as `input`
+   * @param num number of calls for this label
+   * @returns new average with same characteristics
+   */
   function getAverage(input: number[], base: number[], num: number): number[] {
     if (input.length === 0) return base;
     const nextAverage: number[] = [];
@@ -106,6 +129,13 @@ const MainComponent = () => {
     return nextAverage;
   }
 
+  /**
+   * Adds info about previous predictions for this label to LocalStorage or
+   * initializes it if there was no info about this label in Cache
+   * @param input squeezed pixel data from pending prediction
+   * @param label label from pending prediction
+   * @param mustMakeRequest true if label from pending prediction was evaluated as wrong by user
+   */
   function addItemToLocalStorage(
     input: number[],
     label: string,
@@ -134,28 +164,29 @@ const MainComponent = () => {
     }
   }
 
-  function handleCorrect() {
+  /**
+   * Called after user's evaluation of the prediction. Calls a
+   * function to add info about pending prediction to
+   * LocalStorage with reference to the user's evaluation
+   * @param isCorrect true if user clicked `Correct`
+   */
+  function handleUserCheck(isCorrect: boolean) {
     const rawPending = localStorage.getItem("pending");
     if (rawPending) {
       const pending: PendingPrediction = JSON.parse(rawPending);
-      addItemToLocalStorage(pending.squeezed, pending.prediction.label, false);
-      localStorage.removeItem("pending");
-      console.log("LocalStorage:", localStorage);
-      updateAccuracy(true);
-      setPrediction(() => {
-        return { ok: false, label: "", data: [] };
-      });
-    }
-  }
+      if (isCorrect) {
+        addItemToLocalStorage(
+          pending.squeezed,
+          pending.prediction.label,
+          !isCorrect
+        );
+      } else {
+        addItemToLocalStorage([], pending.prediction.label, !isCorrect);
+      }
 
-  function handleWrong() {
-    const rawPending = localStorage.getItem("pending");
-    if (rawPending) {
-      const pending: PendingPrediction = JSON.parse(rawPending);
-      addItemToLocalStorage([], pending.prediction.label, true);
       localStorage.removeItem("pending");
       console.log("LocalStorage:", localStorage);
-      updateAccuracy(false);
+      updateAccuracy(isCorrect);
       setPrediction(() => {
         return { ok: false, label: "", data: [] };
       });
@@ -171,7 +202,7 @@ const MainComponent = () => {
         </div>
         <div className="flex flex-col sm:flex-row items-stretch">
           <CardComponent border="border-magenta-tint-10">
-            <CanvasComponent coefficient={minAccuracyForCashe} />
+            <CanvasComponent coefficient={minAccuracyForCache} />
           </CardComponent>
           <CardComponent border="border-brand-purple-tint-20">
             <PredictionComponent />
@@ -179,28 +210,32 @@ const MainComponent = () => {
         </div>
         <div className="flex flex-row justify-center items-center">
           <div className="flex flex-col-reverse sm:flex-row justify-center items-center">
-          <ButtonComponent
-            classNames="border-magenta-tint-10"
-            text="Clear Canvas"
-            handler={clearCanvas}
-          />
-          <ButtonComponent
-            classNames="border-cyan-tint-20"
-            text="Correct"
-            handler={handleCorrect}
-          />
+            <ButtonComponent
+              classNames="border-magenta-tint-10"
+              text="Clear Canvas"
+              handler={clearCanvas}
+            />
+            <ButtonComponent
+              classNames="border-cyan-tint-20"
+              text="Correct"
+              handler={() => {
+                handleUserCheck(true);
+              }}
+            />
           </div>
           <div className="flex flex-col sm:flex-row justify-center items-center">
-          <ButtonComponent
-            classNames="border-flamingo-tint-20"
-            text="Wrong"
-            handler={handleWrong}
-          />
-          <ButtonComponent
-            classNames="border-brand-purple-tint-20"
-            text="Clear Cache"
-            handler={clearLocalStorage}
-          />
+            <ButtonComponent
+              classNames="border-flamingo-tint-20"
+              text="Wrong"
+              handler={() => {
+                handleUserCheck(false);
+              }}
+            />
+            <ButtonComponent
+              classNames="border-brand-purple-tint-20"
+              text="Clear Cache"
+              handler={clearLocalStorage}
+            />
           </div>
         </div>
       </div>
